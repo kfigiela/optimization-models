@@ -1,0 +1,247 @@
+tasks:
+  T_MontagemProjectPP:
+    task_count: 2549
+    data_size_in: 2099972
+    data_size_out: 8356223.40
+  T_MontagemDiffFit:
+    task_count: 7549
+    data_size_in: 16717045
+    data_size_out: 312275.13
+  T_MontagemConcatFit:
+    task_count: 1
+    data_size_in: 2393263
+    data_size_out: 1568529.00
+  T_MontagemBgModel:
+    task_count: 1
+    data_size_in: 1974160
+    data_size_out: 132549.00
+  T_MontagemBackground:
+    task_count: 2549
+    data_size_in: 8894403
+    data_size_out: 8356223.40
+  T_MontagemImgtbl:
+    task_count: 16
+    data_size_in: 681125068
+    data_size_out: 45150.31
+  T_MontagemAdd:
+    task_count: 16
+    data_size_in: 1362243386
+    data_size_out: 874748160.00
+  T_MontagemShrink:
+    task_count: 16
+    data_size_in: 437374080
+    data_size_out: 521280.00
+  T_MontagemImgtbl2:
+    task_count: 1
+    data_size_in: 8340900
+    data_size_out: 4646.00
+  T_MontagemAdd2:
+    task_count: 1
+    data_size_in: 8345430
+    data_size_out: 7876800.00
+  T_MontagemJPEG:
+    task_count: 1
+    data_size_in: 7876800
+    data_size_out: 353444.00
+
+layers:
+  L_MontagemProjectPP:
+    tasks: ['T_MontagemProjectPP']
+  L_MontagemDiffFit:
+    tasks: ['T_MontagemDiffFit']
+  L_MontagemConcatFit:
+    tasks: ['T_MontagemConcatFit']
+  L_MontagemBgModel:
+    tasks: ['T_MontagemBgModel']
+  L_MontagemBackground:
+    tasks: ['T_MontagemBackground']
+  L_MontagemImgtbl:
+    tasks: ['T_MontagemImgtbl']
+  L_MontagemAdd:
+    tasks: ['T_MontagemAdd']
+  L_MontagemShrink:
+    tasks: ['T_MontagemShrink']
+  L_MontagemImgtbl2:
+    tasks: ['T_MontagemImgtbl2']
+  L_MontagemAdd2:
+    tasks: ['T_MontagemAdd2']
+  L_MontagemJPEG:
+    tasks: ['T_MontagemJPEG']
+
+exec_time: 
+  - [  'T_MontagemProjectPP',  'c1-medium',   1.7868266]
+  - [  'T_MontagemProjectPP',  'c1-xlarge',   2.0683599]
+  - [  'T_MontagemProjectPP', 'c3-2xlarge',   2.2958013]
+  - [  'T_MontagemProjectPP', 'c3-4xlarge',   3.7275151]
+  - [  'T_MontagemProjectPP', 'c3-8xlarge',   5.0021897]
+  - [  'T_MontagemProjectPP',  'c3-xlarge',   1.7403054]
+  - [  'T_MontagemProjectPP',   'm1-large',   1.8203710]
+  - [  'T_MontagemProjectPP',  'm1-medium',   1.4453836]
+  - [  'T_MontagemProjectPP',   'm1-small',   2.7672163]
+  - [  'T_MontagemProjectPP',  'm1-xlarge',   1.5564857]
+  - [  'T_MontagemProjectPP', 'm3-2xlarge',   1.8377495]
+  - [  'T_MontagemProjectPP',   'm3-large',   1.4053780]
+  - [  'T_MontagemProjectPP',  'm3-medium',   1.6071242]
+  - [  'T_MontagemProjectPP',  'm3-xlarge',   1.4449872]
+  - [  'T_MontagemProjectPP',   't1-micro',  11.2726739]
+  - [    'T_MontagemDiffFit',  'c1-medium',   0.3917539]
+  - [    'T_MontagemDiffFit',  'c1-xlarge',   0.5873650]
+  - [    'T_MontagemDiffFit', 'c3-2xlarge',   0.6108414]
+  - [    'T_MontagemDiffFit', 'c3-4xlarge',   0.8537800]
+  - [    'T_MontagemDiffFit', 'c3-8xlarge',   0.9848907]
+  - [    'T_MontagemDiffFit',  'c3-xlarge',   0.4292554]
+  - [    'T_MontagemDiffFit',   'm1-large',   0.3624586]
+  - [    'T_MontagemDiffFit',  'm1-medium',   0.2531087]
+  - [    'T_MontagemDiffFit',   'm1-small',   0.4430298]
+  - [    'T_MontagemDiffFit',  'm1-xlarge',   0.4117332]
+  - [    'T_MontagemDiffFit', 'm3-2xlarge',   0.3708867]
+  - [    'T_MontagemDiffFit',   'm3-large',   0.2785881]
+  - [    'T_MontagemDiffFit',  'm3-medium',   0.3086020]
+  - [    'T_MontagemDiffFit',  'm3-xlarge',   0.3639955]
+  - [    'T_MontagemDiffFit',   't1-micro',   1.6673517]
+  - [  'T_MontagemConcatFit',  'c1-medium', 250.3740662]
+  - [  'T_MontagemConcatFit',  'c1-xlarge', 235.3311649]
+  - [  'T_MontagemConcatFit', 'c3-2xlarge', 155.4634357]
+  - [  'T_MontagemConcatFit', 'c3-4xlarge', 127.1409821]
+  - [  'T_MontagemConcatFit', 'c3-8xlarge', 161.8558604]
+  - [  'T_MontagemConcatFit',  'c3-xlarge', 159.0864161]
+  - [  'T_MontagemConcatFit',   'm1-large', 280.5038049]
+  - [  'T_MontagemConcatFit',  'm1-medium', 209.7407967]
+  - [  'T_MontagemConcatFit',   'm1-small', 441.3008502]
+  - [  'T_MontagemConcatFit',  'm1-xlarge', 222.9746104]
+  - [  'T_MontagemConcatFit', 'm3-2xlarge', 160.5712160]
+  - [  'T_MontagemConcatFit',   'm3-large', 162.3597061]
+  - [  'T_MontagemConcatFit',  'm3-medium', 337.2045263]
+  - [  'T_MontagemConcatFit',  'm3-xlarge', 163.1920269]
+  - [  'T_MontagemConcatFit',   't1-micro',1882.5425113]
+  - [    'T_MontagemBgModel',  'c1-medium',1204.0236515]
+  - [    'T_MontagemBgModel',  'c1-xlarge',1017.4335110]
+  - [    'T_MontagemBgModel', 'c3-2xlarge', 570.1423338]
+  - [    'T_MontagemBgModel', 'c3-4xlarge', 572.6469809]
+  - [    'T_MontagemBgModel', 'c3-8xlarge', 571.0816602]
+  - [    'T_MontagemBgModel',  'c3-xlarge', 574.6019146]
+  - [    'T_MontagemBgModel',   'm1-large',1402.3498985]
+  - [    'T_MontagemBgModel',  'm1-medium',1057.4076423]
+  - [    'T_MontagemBgModel',   'm1-small',2314.1110288]
+  - [    'T_MontagemBgModel',  'm1-xlarge',1058.7656526]
+  - [    'T_MontagemBgModel', 'm3-2xlarge', 615.0225881]
+  - [    'T_MontagemBgModel',   'm3-large', 609.7775008]
+  - [    'T_MontagemBgModel',  'm3-medium',1237.4436455]
+  - [    'T_MontagemBgModel',  'm3-xlarge', 609.8436682]
+  - [    'T_MontagemBgModel',   't1-micro',9463.9226311]
+  - [ 'T_MontagemBackground',  'c1-medium',   0.8035380]
+  - [ 'T_MontagemBackground',  'c1-xlarge',   1.4388781]
+  - [ 'T_MontagemBackground', 'c3-2xlarge',   2.3563037]
+  - [ 'T_MontagemBackground', 'c3-4xlarge',   3.0963999]
+  - [ 'T_MontagemBackground', 'c3-8xlarge',   2.4528737]
+  - [ 'T_MontagemBackground',  'c3-xlarge',   1.4555013]
+  - [ 'T_MontagemBackground',   'm1-large',   0.8476088]
+  - [ 'T_MontagemBackground',  'm1-medium',   0.5267554]
+  - [ 'T_MontagemBackground',   'm1-small',   0.6101178]
+  - [ 'T_MontagemBackground',  'm1-xlarge',   1.2358074]
+  - [ 'T_MontagemBackground', 'm3-2xlarge',   1.6790094]
+  - [ 'T_MontagemBackground',   'm3-large',   0.7604996]
+  - [ 'T_MontagemBackground',  'm3-medium',   0.5243152]
+  - [ 'T_MontagemBackground',  'm3-xlarge',   1.1385830]
+  - [ 'T_MontagemBackground',   't1-micro',   1.1704962]
+  - [     'T_MontagemImgtbl',  'c1-medium',   3.3668607]
+  - [     'T_MontagemImgtbl',  'c1-xlarge',  11.1744553]
+  - [     'T_MontagemImgtbl', 'c3-2xlarge',  16.6476660]
+  - [     'T_MontagemImgtbl', 'c3-4xlarge',  18.8828957]
+  - [     'T_MontagemImgtbl', 'c3-8xlarge',   1.2655955]
+  - [     'T_MontagemImgtbl',  'c3-xlarge',   3.1576437]
+  - [     'T_MontagemImgtbl',   'm1-large',   2.0461463]
+  - [     'T_MontagemImgtbl',  'm1-medium',   3.0623126]
+  - [     'T_MontagemImgtbl',   'm1-small',   3.5151950]
+  - [     'T_MontagemImgtbl',  'm1-xlarge',   7.0736981]
+  - [     'T_MontagemImgtbl', 'm3-2xlarge',   7.2275910]
+  - [     'T_MontagemImgtbl',   'm3-large',   2.3188658]
+  - [     'T_MontagemImgtbl',  'm3-medium',   3.1792142]
+  - [     'T_MontagemImgtbl',  'm3-xlarge',   7.5056782]
+  - [     'T_MontagemImgtbl',   't1-micro',   3.7976388]
+  - [        'T_MontagemAdd',  'c1-medium',  83.0755959]
+  - [        'T_MontagemAdd',  'c1-xlarge', 295.2671362]
+  - [        'T_MontagemAdd', 'c3-2xlarge', 422.4730601]
+  - [        'T_MontagemAdd', 'c3-4xlarge',1429.4185137]
+  - [        'T_MontagemAdd', 'c3-8xlarge', 387.2561192]
+  - [        'T_MontagemAdd',  'c3-xlarge', 195.4388423]
+  - [        'T_MontagemAdd',   'm1-large',  83.7049739]
+  - [        'T_MontagemAdd',  'm1-medium',  45.7024096]
+  - [        'T_MontagemAdd',   'm1-small',  62.5874706]
+  - [        'T_MontagemAdd',  'm1-xlarge', 169.9104934]
+  - [        'T_MontagemAdd', 'm3-2xlarge', 335.2459012]
+  - [        'T_MontagemAdd',   'm3-large',  80.9832643]
+  - [        'T_MontagemAdd',  'm3-medium',  44.4977587]
+  - [        'T_MontagemAdd',  'm3-xlarge', 159.4159115]
+  - [        'T_MontagemAdd',   't1-micro', 114.4635161]
+  - [     'T_MontagemShrink',  'c1-medium',  13.3993150]
+  - [     'T_MontagemShrink',  'c1-xlarge',  59.4536925]
+  - [     'T_MontagemShrink', 'c3-2xlarge',  97.3144888]
+  - [     'T_MontagemShrink', 'c3-4xlarge', 161.7639344]
+  - [     'T_MontagemShrink', 'c3-8xlarge',   3.3850454]
+  - [     'T_MontagemShrink',  'c3-xlarge',  34.7313820]
+  - [     'T_MontagemShrink',   'm1-large',  16.5788190]
+  - [     'T_MontagemShrink',  'm1-medium',   8.5747885]
+  - [     'T_MontagemShrink',   'm1-small',  12.0925561]
+  - [     'T_MontagemShrink',  'm1-xlarge',  34.0346271]
+  - [     'T_MontagemShrink', 'm3-2xlarge',  63.4961238]
+  - [     'T_MontagemShrink',   'm3-large',  16.7517837]
+  - [     'T_MontagemShrink',  'm3-medium',  12.3122235]
+  - [     'T_MontagemShrink',  'm3-xlarge',  36.8724697]
+  - [     'T_MontagemShrink',   't1-micro',  46.7547148]
+  - [    'T_MontagemImgtbl2',  'c1-medium',   0.2303488]
+  - [    'T_MontagemImgtbl2',  'c1-xlarge',   0.2430445]
+  - [    'T_MontagemImgtbl2', 'c3-2xlarge',   0.1112307]
+  - [    'T_MontagemImgtbl2', 'c3-4xlarge',   0.6594795]
+  - [    'T_MontagemImgtbl2', 'c3-8xlarge',   0.4496527]
+  - [    'T_MontagemImgtbl2',  'c3-xlarge',   0.2938862]
+  - [    'T_MontagemImgtbl2',   'm1-large',   0.2337845]
+  - [    'T_MontagemImgtbl2',  'm1-medium',   0.2226078]
+  - [    'T_MontagemImgtbl2',   'm1-small',   0.3121645]
+  - [    'T_MontagemImgtbl2',  'm1-xlarge',   0.2012387]
+  - [    'T_MontagemImgtbl2', 'm3-2xlarge',   0.5979787]
+  - [    'T_MontagemImgtbl2',   'm3-large',   0.1403515]
+  - [    'T_MontagemImgtbl2',  'm3-medium',   0.2707077]
+  - [    'T_MontagemImgtbl2',  'm3-xlarge',   0.1146662]
+  - [    'T_MontagemImgtbl2',   't1-micro',   0.3340925]
+  - [       'T_MontagemAdd2',  'c1-medium',   0.3728463]
+  - [       'T_MontagemAdd2',  'c1-xlarge',   0.3647832]
+  - [       'T_MontagemAdd2', 'c3-2xlarge',   0.2649827]
+  - [       'T_MontagemAdd2', 'c3-4xlarge',   0.5150112]
+  - [       'T_MontagemAdd2', 'c3-8xlarge',   1.6207834]
+  - [       'T_MontagemAdd2',  'c3-xlarge',   0.2351292]
+  - [       'T_MontagemAdd2',   'm1-large',   0.3708110]
+  - [       'T_MontagemAdd2',  'm1-medium',   0.4111126]
+  - [       'T_MontagemAdd2',   'm1-small',   0.6029432]
+  - [       'T_MontagemAdd2',  'm1-xlarge',   0.3341388]
+  - [       'T_MontagemAdd2', 'm3-2xlarge',   0.3585338]
+  - [       'T_MontagemAdd2',   'm3-large',   0.2196143]
+  - [       'T_MontagemAdd2',  'm3-medium',   0.4055775]
+  - [       'T_MontagemAdd2',  'm3-xlarge',   0.2146662]
+  - [       'T_MontagemAdd2',   't1-micro',   0.3534063]
+  - [       'T_MontagemJPEG',  'c1-medium',   0.7363072]
+  - [       'T_MontagemJPEG',  'c1-xlarge',   0.6813876]
+  - [       'T_MontagemJPEG', 'c3-2xlarge',   0.5084235]
+  - [       'T_MontagemJPEG', 'c3-4xlarge',   3.5672891]
+  - [       'T_MontagemJPEG', 'c3-8xlarge',   2.5719451]
+  - [       'T_MontagemJPEG',  'c3-xlarge',   0.5330353]
+  - [       'T_MontagemJPEG',   'm1-large',   0.7613460]
+  - [       'T_MontagemJPEG',  'm1-medium',   0.8900089]
+  - [       'T_MontagemJPEG',   'm1-small',   1.3251227]
+  - [       'T_MontagemJPEG',  'm1-xlarge',   0.7293147]
+  - [       'T_MontagemJPEG', 'm3-2xlarge',   0.5488677]
+  - [       'T_MontagemJPEG',   'm3-large',   0.5803593]
+  - [       'T_MontagemJPEG',  'm3-medium',   0.9255648]
+  - [       'T_MontagemJPEG',  'm3-xlarge',   0.5046134]
+  - [       'T_MontagemJPEG',   't1-micro',   0.7464262]
+  - [  'T_MontagemProjectPP',   'c3-large',   1.5177881]
+  - [    'T_MontagemDiffFit',   'c3-large',   0.3102025]
+  - [  'T_MontagemConcatFit',   'c3-large', 158.4447976]
+  - [    'T_MontagemBgModel',   'c3-large', 578.6829592]
+  - [ 'T_MontagemBackground',   'c3-large',   0.8511010]
+  - [     'T_MontagemImgtbl',   'c3-large',   2.6947519]
+  - [        'T_MontagemAdd',   'c3-large',  95.0488593]
+  - [     'T_MontagemShrink',   'c3-large',  16.6337065]
+  - [    'T_MontagemImgtbl2',   'c3-large',   0.1647105]
+  - [       'T_MontagemAdd2',   'c3-large',   0.2121383]
+  - [       'T_MontagemJPEG',   'c3-large',   0.4903440]

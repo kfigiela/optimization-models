@@ -1,0 +1,90 @@
+#!/usr/bin/cmpl
+%opt cbc threads 2
+%opt cbc verbose 2
+#%opt cbc sec 180
+%opt cbc ratio 0.1
+#%opt cbc maxNodes 100
+%arg -solver cplex
+%opt cplex mip/tolerances/mipgap 0.1
+%data: providers set, instances set, storages set, provider_max_machines[providers], instance_price[instances], cores[instances], transfer_price_out[providers], transfer_price_in[providers], storages_transfer_price_in[storages], storages_transfer_price_out[storages], transfer_rate[storages, providers], transfer_latency[storages, providers], request_price, tasks set, layers set, task_count[tasks], exec_time[tasks, instances], data_size_in[tasks], data_size_out[tasks], workflow_deadline, storage_local_rel set[2], providers_instances set[2], layers_tasks set[2], storage
+%display nonZeros
+%display var *
+%display con none
+
+parameters:
+  #  workflow_deadline := workflow_deadline / 60.0;
+  # Pre-process data relations from tuples to array of sets
+  {s in storages:
+    storage_local[s] := set{[st, p] in storage_local_rel, s = st : p};
+  }
+
+  {p in providers:
+    provider_instances[p] := set{[pr, i] in providers_instances, pr = p : i};
+  }
+
+  {l in layers:
+    layer_tasks[l] := set{[lay, t] in layers_tasks, lay = l : t};
+  }
+
+  # Parameter preprocessing
+  {p in providers, i in provider_instances[p]:
+    instance_max_machines[i] := provider_max_machines[p];
+    transfer_price_in[i] := transfer_price_in[p];
+    transfer_price_out[i] := transfer_price_out[p];
+
+    {s in storages:
+      transfer_rate[s,i]    := transfer_rate[s,p];
+      transfer_latency[s,i] := transfer_latency[s,p];
+    }
+  }
+  {i in instances:
+      instance_sets[i] := set(0..instance_max_machines[i]-1);
+      instance_sets_1[i] := set(1..instance_max_machines[i]-1);
+  }
+
+  {s in storages, p in providers, i in provider_instances[p]:
+    {p << storage_local[s]: non_local[i,s] := 0.0; | default: non_local[i,s] := 1.0; }
+  }
+
+  {t in tasks, i in instances, s in storages:
+      transfer_time[t,i,s] := (((data_size_in[t]+data_size_out[t]) * (transfer_rate[s,i])) + transfer_latency[s,i]);
+      unit_time[t,i,s] := (exec_time[t,i]/3600 + transfer_time[t,i,s]/3600)/min(cores[i], task_count[t]);
+      transfer_cost[t,i,s] := (data_size_out[t]/(1024*1024) * (transfer_price_out[i]+storages_transfer_price_in[s]) + data_size_in[t]/(1024*1024) * (storages_transfer_price_out[s]+transfer_price_in[i])) * non_local[i,s];
+  }
+
+  variables:
+  {i in instances: InstanceUsed[tasks, i]: binary; }
+  {i in instances: InstanceActive[tasks, i]: integer[0..instance_max_machines[i]]; }
+  {i in instances, t in tasks: InstanceTasks[t, i]: integer[0..task_count[t] ]; }
+  LayerTime[layers]: real [0..workflow_deadline];
+
+objectives:
+  cost: sum { t in tasks, i in instances:
+      instance_price[i] * InstanceActive[t,i] + (request_price + transfer_cost[t,i,storage])*InstanceTasks[t,i]
+    } -> min;
+
+constraints:
+  keep_layer_deadlines_sum_under_workflow_deadline:
+    sum { l in layers : LayerTime[l] } <= workflow_deadline;
+
+  bind_instance_active_with_instance_tasks {t in tasks, i in instances:
+    InstanceActive[t,i] >= InstanceUsed[t,i];
+    InstanceActive[t,i] <= InstanceUsed[t,i]*instance_max_machines[i];
+
+    InstanceTasks[t,i] >= InstanceActive[t,i];
+    InstanceTasks[t,i] <= task_count[t]*InstanceUsed[t,i];
+  }
+
+  keep_layer_deadline {l in layers, t in layer_tasks[l], i in instances:
+    InstanceTasks[t,i]*unit_time[t,i,storage] <= LayerTime[l]*InstanceActive[t,i];
+  }
+
+  enough_power {t in tasks:
+    sum {i in instances: InstanceTasks[t,i]} = task_count[t];
+    sum {i in instances: InstanceUsed[t,i]} = 1;
+  }
+
+  force_provider_instance_limit {l in layers, p in providers:
+    sum {i in provider_instances[p], t in layer_tasks[l]: InstanceActive[t,i]} <= provider_max_machines[p];
+  }
+

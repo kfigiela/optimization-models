@@ -1,0 +1,66 @@
+tasks:
+  T_MontagemProjectPP:
+    task_count: 82
+    exec_time: 0.003766
+    data_size_in: 4.026779
+    data_size_out: 7.936480
+  T_MontagemDiffFit:
+    task_count: 330
+    exec_time: 0.002940
+    data_size_in: 15.874499
+    data_size_out: 0.287510
+  T_MontagemConcatFit:
+    task_count: 1
+    exec_time: 0.007333
+    data_size_in: 0.296089
+    data_size_out: 0.066074
+  T_MontagemBgModel:
+    task_count: 1
+    exec_time: 0.013047
+    data_size_in: 0.079177
+    data_size_out: 0.004158
+  T_MontagemBackground:
+    task_count: 82
+    exec_time: 0.002968
+    data_size_in: 7.940638
+    data_size_out: 7.936480
+  T_MontagemImgTbl:
+    task_count: 1
+    exec_time: 0.010514
+    data_size_in: 650.804456
+    data_size_out: 0.026459
+  T_MontagemAdd:
+    task_count: 1
+    exec_time: 0.013700
+    data_size_in: 0.026749
+    data_size_out: 350.017406
+  T_MontagemShrink:
+    task_count: 1
+    exec_time: 0.004344
+    data_size_in: 350.017406
+    data_size_out: 7.003149
+  T_MontagemJPEG:
+    task_count: 1
+    exec_time: 0.001061
+    data_size_in: 7.003149
+    data_size_out: 1.934573
+
+layers:
+  L_MontagemProjectPP:
+    tasks: ['T_MontagemProjectPP']
+  L_MontagemDiffFit:
+    tasks: ['T_MontagemDiffFit']
+  L_MontagemConcatFit:
+    tasks: ['T_MontagemConcatFit']
+  L_MontagemBgModel:
+    tasks: ['T_MontagemBgModel']
+  L_MontagemBackground:
+    tasks: ['T_MontagemBackground']
+  L_MontagemImgTbl:
+    tasks: ['T_MontagemImgTbl']
+  L_MontagemAdd:
+    tasks: ['T_MontagemAdd']
+  L_MontagemShrink:
+    tasks: ['T_MontagemShrink']
+  L_MontagemJPEG:
+    tasks: ['T_MontagemJPEG']
