@@ -1,0 +1,1 @@
+ffmpeg -i "$1/results-%d.png" -y -an -b 5M $1/results.mp4

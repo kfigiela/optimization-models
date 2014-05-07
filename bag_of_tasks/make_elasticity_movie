@@ -1,0 +1,1 @@
+ffmpeg -i "$1/results-%d_elasticity.png" -y -an -b 5M $1/results_elasticity.mp4

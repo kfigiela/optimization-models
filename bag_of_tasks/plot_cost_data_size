@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+require 'yaml'
+require 'ostruct'
+require 'pp'
+require 'erb'
+require 'fileutils'
+require 'monitor'
+
+# IO.popen("/opt/local/bin/gnuplot", "w") do |gnuplot|
+# IO.popen("/bin/cat", "w") do |gnuplot|
+# IO.popen("/Users/kamilfigiela/Projekty/Cloud-REU-11/testy/model/gnuplot_pipe", "a") do |gnuplot|
+begin
+  gnuplot = $stdout
+  gnuplot << <<-eos
+  reset
+  
+  set grid
+  set autoscale x
+  set autoscale y
+
+  set xrange [0:256]
+
+  set xlabel 'Data size (MB)'
+  set ylabel 'Cost ($)'
+  set key outside
+  
+  plot '-' title 'Deadline 5' with l, '-' title 'Deadline 10' with l,  '-' title 'Deadline 15' with l,  '-' title 'Deadline 20' with l,  '-' title 'Deadline 25'  with l,  '-' title 'Deadline 30'  with l,  '-' title 'Deadline 35'  with l
+
+  eos
+  plots = {5 => "", 10 => "", 15 => "", 20 => "", 25 => "", 30 => "", 35 => ""}
+  
+  Dir[ARGV[0]+"/*.yml"].sort_by {|f| /(\d+)/.match(f)[1].to_i }.each do |f|
+    datasize = /(\d+)/.match(f)[1]
+    $stderr.puts f
+    data = File.open(f, "r") do |f| f.read end
+    results = YAML.load data
+
+    min = {}
+    s3 = Array.new { |i| s3[i] = [nil,nil] }
+    results["s3"].sort_by { |l| l[0] }.each do |info|
+      min[info[0]] = info[1].total_cost
+    end
+    results["cf"].sort_by { |l| l[0] }.each do |info|
+      min[info[0]] = info[1].total_cost if info[1].total_cost.to_f < min[info[0]].to_f
+    end
+    plots.each do |key, value|
+      plots[key] << "#{datasize}\t#{min[key]}\n"
+    end
+  end
+  plots.each do |key, value|
+    gnuplot << "#{value}\ne\n"
+  end
+end

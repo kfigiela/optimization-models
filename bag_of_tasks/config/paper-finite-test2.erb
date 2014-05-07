@@ -1,0 +1,107 @@
+# Data from http://blog.cloudharmony.com/2010/05/what-is-ecu-cpu-benchmarking-in-cloud.html
+
+set INSTANCE := 
+  m2.4xlarge m2.2xlarge linux.c1.xlarge m2.xlarge m1.xlarge m1.large c1.medium m1.small 
+  rs-16gb rs-2gb rs-1gb rs-4gb
+  gg-8gb gg-4gb gg-2gb gg-1gb
+  eh-8gb-20gh eh-4gb-8gh eh-2gb-4gh eh-1gb-2gh
+  private
+;
+
+set STORAGE := S3 CloudFiles ;
+set PROVIDER := amazon rackspace gogrid elastichosts private;
+
+set PROVIDER_INSTANCES[amazon]        := m2.4xlarge m2.2xlarge linux.c1.xlarge m2.xlarge m1.xlarge m1.large c1.medium m1.small; 
+set PROVIDER_INSTANCES[rackspace]     := rs-16gb rs-2gb rs-1gb rs-4gb; 
+set PROVIDER_INSTANCES[gogrid]        := gg-8gb gg-4gb gg-2gb gg-1gb; 
+set PROVIDER_INSTANCES[elastichosts]  := eh-8gb-20gh eh-4gb-8gh eh-2gb-4gh eh-1gb-2gh; 
+set PROVIDER_INSTANCES[private]       := private; 
+
+set STORAGE_LOCAL[S3]     := amazon;
+set STORAGE_LOCAL[CloudFiles] := rackspace;
+
+param:          provider_max_machines :=
+  amazon        20
+  rackspace     15
+  gogrid        10
+  elastichosts  20
+  private       10
+;
+
+param:        instance_price  ccu     instance_transfer_price_out  instance_transfer_price_in :=
+# Amazon Web Services (AWS) [US East]                    
+  m2.4xlarge        2.40    27.25     0.0001                       0
+  m2.2xlarge        1.20    14.89     0.0001                       0
+  linux.c1.xlarge   0.68    8.78      0.0001                       0
+  m2.xlarge         0.50    7.05      0.0001                       0
+  m1.xlarge         0.68    5.15      0.0001                       0
+  m1.large          0.34    4.08      0.0001                       0
+  c1.medium         0.17    3.43      0.0001                       0
+  m1.small          0.085   0.92      0.0001                       0
+# Rackspace Cloud [Dallas]                                          
+  rs-16gb           0.96    4.95      0.00018                      0
+  rs-2gb            0.12    4.94      0.00018                      0
+  rs-1gb            0.06    4.93      0.00018                      0
+  rs-4gb            0.24    4.90      0.00018                      0
+# GoGrid [CA, US]                                                   
+  gg-8gb            1.52    23.2      0.00029                      0
+  gg-4gb            0.76    9.28      0.00029                      0
+  gg-2gb            0.38    4.87      0.00029                      0
+  gg-1gb            0.19    4.42      0.00029                      0
+# ElasticHosts [UK]                                                 
+  eh-8gb-20gh       0.654   9.98      0.00030                      0
+  eh-4gb-8gh        0.326   5.54      0.00030                      0
+  eh-2gb-4gh        0.164   4.75      0.00030                      0
+  eh-1gb-2gh        0.082   4.30      0.00030                      0
+# hyphotetical instance of private cloud                
+  private           0       1         0                            0
+;
+
+
+param:        storage_transfer_price_in  storage_transfer_price_out  DataAssignment:=
+  S3          0.000                      0.0001                      <%= if s3 then 1 else 0 end %>
+  CloudFiles  0.000                      0.0001                      <%= unless s3 then 1 else 0 end %>
+;
+
+param transfer_rate:  S3  CloudFiles :=
+# Amazon Web Services (AWS) [US East]
+  m2.4xlarge        50    20
+  m2.2xlarge        50    20
+  linux.c1.xlarge   50    20
+  m2.xlarge         50    20
+  m1.xlarge         50    20
+  m1.large          50    20
+  c1.medium         50    20
+  m1.small          50    20
+# Rackspace Cloud [Dalla30s]
+  rs-16gb           30    60
+  rs-2gb            30    60
+  rs-1gb            30    60
+  rs-4gb            30    60
+# GoGrid [CA, US]             
+  gg-8gb            30    20
+  gg-4gb            30    20
+  gg-2gb            30    20
+  gg-1gb            30    20
+# ElasticHosts [UK]           
+  eh-8gb-20gh       20    25
+  eh-4gb-8gh        20    25
+  eh-2gb-4gh        20    25
+  eh-1gb-2gh        20    25
+# hyphotetical instance of private cloud
+  private           15    20
+;
+
+param total_tasks     := 20000 ;
+param exec_time       := 0.1 ; # hours
+# param data_size := 1000.4 ; # here data size does not matter: since both S3 and RackSpace are free for local usage, only compute cost matters
+param data_size_in    := <%= dataSize %> ;  # 0.3 MB - real FASTA output
+param data_size_out   := <%= dataSize %> ;  # 0.3 MB - real FASTA output
+#param data_size := 0.00005 ;  # for private instances also CloudFiles are cheaper
+param request_price   := 0.00001 ; # price per request (per task)
+param deadline        := <%= deadline %> ;
+
+# calculate needed sets
+
+let {p in PROVIDER, i in PROVIDER_INSTANCES[p]} instance_max_machines[i] := provider_max_machines[p];
+let {p in PROVIDER, i in PROVIDER_INSTANCES[p], s in STORAGE} local[i,s] := if p in STORAGE_LOCAL[s] then 0 else 1;

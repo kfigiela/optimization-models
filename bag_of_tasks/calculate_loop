@@ -1,0 +1,101 @@
+#!/usr/bin/env ruby
+require 'yaml'
+require 'ostruct'
+require 'pp'
+require 'erb'
+require 'fileutils'
+require 'monitor'
+
+
+
+if ARGV.length != 5
+  puts "Usage: data.dat.erb upper_bound ds_low ds_hi ds_step"
+  exit 1
+end
+
+config = ARGV[0]
+
+template = File.open("config/"+config, "r") do |f|
+    ERB.new(f.read)
+end
+
+ampl_template = File.open("model4.ampl.erb", "r") do |f|
+      ERB.new(f.read)
+    end
+
+stop = false
+Kernel.trap("INT") {
+  stop = true
+}
+begin
+  Dir["results/#{config}/*/*"].each {|f| File.unlink(f) }
+rescue
+  puts "Couldn't empty log dir"
+end
+
+ARGV[2].to_i.step(ARGV[3].to_i, ARGV[4].to_i) do |dataSize|
+  break if stop    
+  results = []
+  results.extend MonitorMixin
+  results2 = []
+  results2.extend MonitorMixin
+  queue = 1.step(ARGV[1].to_i, 1).to_a 
+  queue = queue.map{|i| [i,true]} + queue.map{|i| [i,false]} 
+  queue.shuffle!
+  queue.extend MonitorMixin        
+
+  begin
+    FileUtils.mkdir_p("results/#{config}/logs-#{dataSize}")
+  rescue
+    puts "Probably directory exists"
+  end
+
+  threads = 4.times.to_a.map do |tid|
+    Thread.new do
+      begin              
+        File.open("tmp/model4_#{tid}.ampl", "w") do |f|
+          f.write ampl_template.result binding
+        end    
+        tmp = nil
+        while tmp = queue.synchronize { queue.shift }
+          break if stop            
+          deadline, s3 = tmp
+          $stderr.puts deadline, s3
+          File.open("tmp/data_#{tid}.dat", "w") do |f|
+            f.write template.result binding
+          end
+          output = `time ampl tmp/model4_#{tid}.ampl 2>&1 | tee results/#{config}/logs-#{dataSize}/#{"%03d" % deadline}-#{if s3 then "s3" else "cf" end}.txt`
+        
+          # p output
+          begin
+            output = output.match(/--- solution ---(.*)--- end ---/m)[1]
+
+            data = OpenStruct.new YAML.load output
+            if data.status != "solved"
+              $stderr.puts "# Nierozwiazane @ #{deadline}"
+              next
+            end
+            data.instance.map! { |v| OpenStruct.new v }  
+            if s3
+              results.synchronize { results << [deadline, data]}
+            else
+              results2.synchronize { results2 << [deadline, data]}
+            end                                          
+
+          rescue
+            $stderr.puts "# Blad @ #{deadline}"
+          end
+        end        
+      rescue Exception => e
+        p e
+        puts e.backtrace.join("\n")
+      end
+    end
+  end
+  threads.each {|t| t.join}
+
+  puts "Done, saving results"
+  File.open "results/#{config}/results-#{dataSize}.yml", "w" do |f|
+    f.write (YAML.dump({"s3" => results, "cf" => results2}))
+  end
+end

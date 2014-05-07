@@ -1,0 +1,2 @@
+#!/bin/sh
+./calculate $1 $2 && ./plot $1 && gnuplot ./results/$1/results.plt

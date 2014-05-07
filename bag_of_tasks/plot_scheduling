@@ -1,0 +1,95 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+
+require 'ostruct'
+require 'yaml'
+require 'monitor'
+require 'fileutils'
+
+if ARGV.length != 1
+  puts "usage: data.dat.erb"
+  exit 1
+end
+  
+queue =  Dir["results/#{ARGV[0]}/logs/*.txt"]
+queue.extend MonitorMixin
+threads = 4.times.to_a.map do |tid|
+  Thread.new do
+    IO.popen("/opt/local/bin/gnuplot", "w") do |gnuplot|
+      begin
+        while input = queue.synchronize { queue.shift }
+          print "."
+          File.open input do |f|
+            begin
+              output = f.read
+              output = output.match(/--- solution ---(.*)--- end ---/m)[1]
+              data   = OpenStruct.new YAML.load output
+              
+              if data.status == "infeasible"
+                next
+              end
+              data.instance.map! { |v| OpenStruct.new v }
+            rescue
+              puts "\nProblem with #{input}, skipping..."
+              next
+            end
+            icnt   = 0
+
+            tasks  = []
+            vms    = []
+            labels = []
+            data.instance.each do |i|
+              if i.count > 0
+                vms << "#{icnt+0.5} #{i.instance_deadline} 1\n"
+                i.tasks_per_deadline.downto(0) do |t|
+                  tasks << "#{icnt+0.5} #{i.unit_time*t} 1\n"
+                end
+              end
+              if i.tail > 0
+                icnt += 1
+                vms << "#{icnt+0.5} #{i.tail} 1\n"
+                (i.tasks-i.tasks_per_deadline*i.count).downto(0) do |t|
+                  tasks << "#{icnt+0.5} #{i.unit_time*t} 1\n"
+                end
+              end
+              labels << "'#{i.name} x #{i.count}#{if i.tail > 0 then " + 1" end}' #{icnt+0.5+(if i.tail > 0 then -0.5 else 0 end)}"
+              icnt += 1.5
+            end
+
+
+
+            f      = ""
+            f << "#!/usr/bin/env gnuplot\n"
+            f << "set term pdf monochrome\n"
+            f << "set out \"#{input.sub('txt', 'pdf')}\"\n"
+            f << "set xtics (#{labels.join ","})\n"
+            f << "set key outside bottom center\n"
+            f << "set title 'Storage: %s, Cost: %.2f, Duration: %d, Deadline: %d, Idle: %.2f %%'\n" % [data.storage, data.total_cost, data.duration, data.deadline, data.idle/data.total_hours*100.0]
+            f << "
+            set mytics 1    
+            set ytics 1
+            set grid ytics mytics
+            set xlabel 'Instance type'
+            set ylabel 'VM running time'
+          "
+
+            f << "plot '-' with boxes fs pattern 6 title 'Idle time', '-' with boxes fs pattern 0 title 'Task processing'\n"
+
+            f << (vms.join "\n")
+            f << "e\n"
+            f << (tasks.join "\n")
+            f << "e\n\n\n"
+            File.open(input.sub('txt', 'plt'), "w") do |f_out|
+              f_out.write f
+            end
+
+            gnuplot.write f
+            # `open \"#{ARGV[0].sub('txt', 'pdf')}\"`
+          end
+        end
+      rescue
+        puts "Problem plotting..."
+      end
+    end
+  end
+end
