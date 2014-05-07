@@ -1,0 +1,108 @@
+#!/usr/bin/cmpl
+%opt cbc threads 8
+# %opt cbc verbose 2
+%opt cbc sec 1920
+%opt cbc ratio 0.05
+%data: providers set, instances set, storages set, provider_max_machines[providers], instance_price[instances], ccu[instances], transfer_price_out[providers], transfer_price_in[providers], storages_transfer_price_in[storages], storages_transfer_price_out[storages], transfer_rate[storages, providers], request_price, tasks set, layers set, task_count[tasks], exec_time[tasks], data_size_in[tasks], data_size_out[tasks], workflow_deadline, storage_local_rel set[2], providers_instances set[2], layers_tasks set[2], storage
+%display nonZeros
+%display var *
+%display con none
+
+parameters:
+
+  # Pre-process data relations from tuples to array of sets
+  {s in storages:
+    storage_local[s] := set{[st, p] in storage_local_rel, s = st : p};
+  }
+
+  {p in providers:
+    provider_instances[p] := set{[pr, i] in providers_instances, pr = p : i};
+  }
+
+  {l in layers:
+    layer_tasks[l] := set{[lay, t] in layers_tasks, lay = l : t};
+  }
+
+  # Parameter preprocessing
+  {p in providers, i in provider_instances[p]:
+    instance_max_machines[i] := provider_max_machines[p];
+    transfer_price_in[i] := transfer_price_in[p];
+    transfer_price_out[i] := transfer_price_out[p];
+
+    {s in storages:
+      transfer_rate[s,i] := transfer_rate[s,p];
+    }
+  }
+  {i in instances:
+      instance_sets[i] := set(0..instance_max_machines[i]-1);
+      instance_sets_1[i] := set(1..instance_max_machines[i]-1);
+  }
+
+  {s in storages, p in providers, i in provider_instances[p]: 
+    {p << storage_local[s]: non_local[i,s] := 0.0; | default: non_local[i,s] := 1.0; } 
+  }
+
+  {t in tasks, i in instances, s in storages:
+      transfer_time[t,i,s] :=  ((data_size_in[t]+data_size_out[t]) / (transfer_rate[s,i] * 3600));
+      {exec_time[t] / ccu[i] > transfer_time[t,i,s]: 
+        unit_time[t,i,s] := exec_time[t] / ccu[i]; 
+        | default: unit_time[t,i,s] :=  transfer_time[t,i,s];
+      }
+      transfer_cost[t,i,s] := (data_size_out[t] * (transfer_price_out[i]+storages_transfer_price_in[s]) + data_size_in[t] * (storages_transfer_price_out[s]+transfer_price_in[i])) * non_local[i,s];
+  }
+
+variables:
+  {i in instances: InstanceActive[tasks, i, instance_sets[i] ]: binary; }
+  {i in instances: InstanceHours[tasks, i, instance_sets[i]]: integer[0..workflow_deadline]; }
+  {i in instances, t in tasks: InstanceTasks[t, i, instance_sets[i]]: integer[0..task_count[t] ]; }
+  LayerDeadline[layers]: integer [1..workflow_deadline];
+  LayerTime[layers]: real [0..workflow_deadline];
+
+objectives:
+  cost: sum { t in tasks, i in instances, idx in instance_sets[i]: 
+      instance_price[i] * InstanceHours[t,i,idx] + (request_price + transfer_cost[t,i,storage])*InstanceTasks[t,i,idx] 
+    } -> min;
+
+constraints:
+  keep_layer_deadlines_sum_under_workflow_deadline:
+    sum { l in layers : LayerTime[l] } <= workflow_deadline;
+
+  keep_layer_time {l in layers:
+    LayerTime[l]     <= LayerDeadline[l];
+    LayerDeadline[l] <= LayerTime[l] + 1;
+  }
+
+  bind_instance_active_with_instance_hours {t in tasks, i in instances, idx in instance_sets[i]:
+    InstanceHours[t,i,idx] >= InstanceActive[t,i,idx];
+    InstanceHours[t,i,idx] <= workflow_deadline*InstanceActive[t,i,idx];
+  }
+
+  bind_instance_active_with_instance_tasks {t in tasks, i in instances, idx in instance_sets[i]:
+    InstanceTasks[t,i,idx] >= InstanceActive[t,i,idx];
+    InstanceTasks[t,i,idx] <= task_count[t] * InstanceActive[t,i,idx];
+  }
+
+  keep_layer_deadline {l in layers, t in layer_tasks[l], i in instances, idx in instance_sets[i]:
+    InstanceHours[t,i,idx] <= LayerDeadline[l];
+    InstanceTasks[t,i,idx]*unit_time[t,i,storage] <= LayerTime[l];
+  }
+
+  is_there_enough_processing_power_to_do_the_tasks {t in tasks, i in instances, idx in instance_sets[i]:
+    InstanceHours[t,i,idx] >= InstanceTasks[t,i,idx]*unit_time[t,i,storage];
+    InstanceHours[t,i,idx] <= InstanceTasks[t,i,idx]*unit_time[t,i,storage] + 1;
+  }
+
+  enough_power {t in tasks:
+    sum {i in instances, idx in instance_sets[i]: InstanceTasks[t,i,idx]} = task_count[t];
+  }
+
+  discard_symmetric_solutions {t in tasks, i in instances, idx in instance_sets_1[i]:
+    InstanceHours[t,i,idx] <= InstanceHours[t,i,idx-1];
+    InstanceActive[t,i,idx] <= InstanceActive[t,i,idx-1];
+    InstanceTasks[t,i,idx] <= InstanceTasks[t,i,idx-1];
+  }
+
+  force_provider_instance_limit {l in layers, p in providers:
+    sum {i in provider_instances[p], t in layer_tasks[l], idx in instance_sets[i]: InstanceActive[t,i,idx]} <= provider_max_machines[p];
+  }
+

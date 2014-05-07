@@ -1,0 +1,25 @@
+set TASK = mProject mDiffFit mConcatFit mBgModel mBackground mImgtbl mAdd mShrink mJPEG;
+set LAYER = lmProject lmDiffFit lmConcatFit lmBgModel lmBackground lmImgtbl lmAdd lmShrink lmJPEG;
+
+set LAYER_TASK[lmProject]    = mProject;
+set LAYER_TASK[lmDiffFit]    = mDiffFit;
+set LAYER_TASK[lmConcatFit]  = mConcatFit;
+set LAYER_TASK[lmBgModel]    = mBgModel;
+set LAYER_TASK[lmBackground] = mBackground;
+set LAYER_TASK[lmImgtbl]     = mImgtbl;
+set LAYER_TASK[lmAdd]        = mAdd;
+set LAYER_TASK[lmShrink]     = mShrink;
+set LAYER_TASK[lmJPEG]       = mJPEG;
+
+param: 
+                  task_count exec_time data_size_in data_size_out :=
+  mProject                45     13.59         4.03          7.94
+  mDiffFit               107     10.59        15.88          0.54
+  mConcatFit               1     13.60         0.03          0.02
+  mBgModel                 1     10.88         0.03          0.00
+  mBackground             45     10.74         7.95          7.94
+  mImgtbl                  1     10.69       357.27          0.01
+  mAdd                     1     30.34       357.28        330.86
+  mShrink                  1     12.26       165.43          6.62
+  mJPEG                    1     10.96         6.62          0.32
+;
